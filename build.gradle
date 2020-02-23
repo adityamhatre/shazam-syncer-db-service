@@ -1,0 +1,53 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+}
+
+group = 'com.adityamhatre'
+version = '1.0.0'
+sourceCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    implementation group: 'org.eclipse.persistence', name: 'eclipselink', version: '2.7.5'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.9'
+
+
+    implementation "org.flywaydb:flyway-core:6.2.2"
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+
+}
+
+
+task buildDockerImage(type: Exec) {
+    dependsOn clean
+    dependsOn build
+    tasks.findByName('build').mustRunAfter "clean"
+    commandLine 'docker', 'build', '-t', 'database-service:1.0.0', '.'
+}
+
+test {
+    useJUnitPlatform()
+}
